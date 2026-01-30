@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/devcontainers/python:3.10-bookworm
 # ---------------------------------------------
 RUN rm -f /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install -y --no-install-recommends \
-    build-essential cmake ninja-build python3 curl xz-utils ca-certificates \
+    build-essential cmake ninja-build python3 curl xz-utils ca-certificates git \
  && rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------
@@ -37,3 +37,6 @@ RUN set -e; \
 ENV PATH="/opt/toolchain/bin:${PATH}"
 
 WORKDIR /src
+
+# Add repository to safe directories
+RUN git config --system --add safe.directory /src

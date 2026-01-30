@@ -19,6 +19,36 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 
 enable_language(C ASM)
 
+find_package(Git QUIET)
+if(GIT_FOUND)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --exact-match --abbrev=0
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_DESCRIBE
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+        RESULT_VARIABLE GIT_DESCRIBE_RESULT
+    )
+    if(GIT_DESCRIBE_RESULT EQUAL 0)
+        set(GIT_VERSION "${GIT_DESCRIBE}")
+    else()
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            OUTPUT_VARIABLE GIT_REV
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+        set(GIT_VERSION "${GIT_REV}")
+    endif()
+
+    if(DEFINED GIT_VERSION)
+        set(VERSION_STRING_2 "${GIT_VERSION}" CACHE STRING "Firmware version determined from Git" FORCE)
+    endif()
+else()
+    message(STATUS "Git not found.")
+endif()
+
 if(ENABLE_FEAT_F4HWN)
     if(NOT AUTHOR_STRING_1)
         set(AUTHOR_STRING_1 "EGZUMER")
